@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import { CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import { CameraCapturedPicture, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
+import modelService from './services/modelSevice';
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null); 
+  const [photo, setPhoto] = useState<CameraCapturedPicture | null>(null);
 
   useEffect(() => {
     // If permission is granted the we can actually use the camera
@@ -22,9 +24,12 @@ export default function CameraScreen() {
   // Function to capture a picture
   const takePicture = async () => {
     if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync();
+      const photoData: CameraCapturedPicture = await cameraRef.current.takePictureAsync();
       // Handle the captured photo (e.g., display or store it)
-      console.log("Captured Photo URI:", photo.uri);
+
+      setPhoto(photoData)
+      const predictionResult = await modelService.predictImage(photoData.uri);
+      console.log(predictionResult);  //display the predicted food 
     }
   };
 

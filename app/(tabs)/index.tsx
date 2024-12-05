@@ -1,5 +1,5 @@
 import { Text, View, StyleSheet, Button } from 'react-native';
- import { Link } from 'expo-router'; 
+//  import { Link } from 'expo-router'; 
 import Entypo from '@expo/vector-icons/Entypo';
 import { CustomButton } from '../components/CustomButton';
 
