@@ -2,12 +2,15 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CameraCapturedPicture, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import modelService from './services/modelSevice';
+import { ClassifyFoodWidget } from './components/ClassifyFoodWidget';
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null); 
   const [photo, setPhoto] = useState<CameraCapturedPicture | null>(null);
+  const [isWidgetVisible, setWidgetVisible] = useState(false);
+  const [predictedClass, setPredictedClass] = useState<string | null>(null)
 
   useEffect(() => {
     // If permission is granted the we can actually use the camera
@@ -17,9 +20,13 @@ export default function CameraScreen() {
   }, [permission, requestPermission]);
 
   // Function to handle switch between front and back camera
-  function toggleCameraFacing() {
+  const toggleCameraFacing =() => {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   }
+
+  const toggleWidgetVisibility = () => {
+    setWidgetVisible((prevState) => !prevState);
+  };
 
   // Function to capture a picture
   const takePicture = async () => {
@@ -28,8 +35,23 @@ export default function CameraScreen() {
       // Handle the captured photo (e.g., display or store it)
 
       setPhoto(photoData)
+      
       const predictionResult = await modelService.predictImage(photoData.uri);
-      console.log(predictionResult);  //display the predicted food 
+      if (!predictionResult || !predictionResult.data) {
+        console.log("Prediction result or data is undefined");
+        return;
+      }
+    
+      const predictedClassName = predictionResult.data.predicted_class;
+      toggleWidgetVisibility();
+      setPredictedClass(predictedClassName)
+      if (!predictedClassName) {
+        console.log("Predicted class is undefined");
+        return;
+      }
+      console.log("Predicted as: ", predictionResult);
+      const uploadResult = await modelService.storePredictionImage(photoData.uri, predictedClassName);
+      console.log("Store results: ", uploadResult);  //display the predicted food 
     }
   };
 
@@ -67,6 +89,7 @@ export default function CameraScreen() {
           </TouchableOpacity>
         </View>
       </CameraView>
+      {isWidgetVisible && <ClassifyFoodWidget predictedClass={predictedClass}/>}
     </View>
   );
 }
