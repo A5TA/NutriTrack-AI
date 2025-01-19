@@ -2,15 +2,13 @@ import React, { useState, useRef, useEffect } from 'react';
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { CameraCapturedPicture, CameraType, CameraView, useCameraPermissions } from 'expo-camera';
 import modelService from './services/modelSevice';
-import { ClassifyFoodWidget } from './components/ClassifyFoodWidget';
+import { router } from 'expo-router';
 
 export default function CameraScreen() {
   const [facing, setFacing] = useState<CameraType>('back');
   const [permission, requestPermission] = useCameraPermissions();
   const cameraRef = useRef<any>(null); 
   const [photo, setPhoto] = useState<CameraCapturedPicture | null>(null);
-  const [isWidgetVisible, setWidgetVisible] = useState(false);
-  const [predictedClass, setPredictedClass] = useState<string | null>(null)
 
   useEffect(() => {
     // If permission is granted the we can actually use the camera
@@ -23,10 +21,6 @@ export default function CameraScreen() {
   const toggleCameraFacing =() => {
     setFacing((current) => (current === 'back' ? 'front' : 'back'));
   }
-
-  const toggleWidgetVisibility = () => {
-    setWidgetVisible((prevState) => !prevState);
-  };
 
   // Function to capture a picture
   const takePicture = async () => {
@@ -43,15 +37,9 @@ export default function CameraScreen() {
       }
     
       const predictedClassName = predictionResult.data.predicted_class;
-      toggleWidgetVisibility();
-      setPredictedClass(predictedClassName)
-      if (!predictedClassName) {
-        console.log("Predicted class is undefined");
-        return;
-      }
       console.log("Predicted as: ", predictionResult);
-      const uploadResult = await modelService.storePredictionImage(photoData.uri, predictedClassName);
-      console.log("Store results: ", uploadResult);  //display the predicted food 
+      modelService.updatePredictedClass(predictedClassName); //store the predicted class in the service
+      router.push("/save_meal");// Navigate only after predictions are stored
     }
   };
 
@@ -89,7 +77,6 @@ export default function CameraScreen() {
           </TouchableOpacity>
         </View>
       </CameraView>
-      {isWidgetVisible && <ClassifyFoodWidget predictedClass={predictedClass}/>}
     </View>
   );
 }
