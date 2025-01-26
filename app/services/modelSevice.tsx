@@ -5,6 +5,23 @@ class ModelService {
     predictedUri: string | null = null;
     predictedClass: string | null = null;
 
+    async getMealMacros(mealType: string | null) {
+      try {
+        if (!mealType || mealType === "") {
+          return null
+        }
+        const response = await fetch(`${this.api_endpoint_backend}/getMacros/${mealType}`);
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error during fetching meal macros:', error);
+        return null;
+      }
+    }
+
     async updatePredictedClass(newClass: string | null) {
       this.predictedClass = newClass ? newClass : "";
     }

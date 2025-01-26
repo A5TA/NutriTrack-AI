@@ -10,6 +10,7 @@ export default function SaveMealScreen() {
   const [modifiedClass, setModifiedClass] = useState<string | null>(null);
   const [predictedUri, setPredictedUri] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [mealMacros, setMealMacros] = useState<any | null>(null);
 
   const [mealType, setMealType] = useState<string>("Breakfast");
 
@@ -65,6 +66,16 @@ export default function SaveMealScreen() {
     }
   };
 
+  const handleGetMacros = async () => {
+    try {
+      const mealMacros = await modelService.getMealMacros(modifiedClass);
+      console.log("Meal Macros: ", mealMacros);
+      setMealMacros(mealMacros);
+    } catch (error) {
+      console.error("Error fetching meal macros: ", error);
+    }
+  }
+
   const handleCancel = () => {
     router.push("/");
   }
@@ -113,6 +124,35 @@ export default function SaveMealScreen() {
           <Picker.Item label="Dinner" value="Dinner" />
         </Picker>
       </View>
+      {/* Get the meals Macros */}
+      <TouchableOpacity onPress={handleGetMacros} style={styles.macroButton}>
+        <Text style={styles.saveButtonText}>Update Macros</Text>
+      </TouchableOpacity>
+      {/* Macros Card */}
+      {mealMacros && (
+        <View style={styles.macroCard}>
+          <Text style={styles.label}>Estimated Macros</Text>
+          <View style={styles.macroItems}>
+        <View style={styles.macroRow}>
+          <Text style={styles.macroValue}>{mealMacros?.Calories}</Text>
+          <Text style={styles.macroLabel}>Calories</Text>
+        </View>
+        <View style={styles.macroRow}>
+          <Text style={styles.macroValue}>{mealMacros?.Protein}g</Text>
+          <Text style={styles.macroLabel}>Protein</Text>
+        </View>
+        <View style={styles.macroRow}>
+          <Text style={styles.macroValue}>{mealMacros?.Fat}g</Text>
+          <Text style={styles.macroLabel}>Fat</Text>
+        </View>
+        <View style={styles.macroRow}>
+          <Text style={styles.macroValue}>{mealMacros?.Carbs}g</Text>
+          <Text style={styles.macroLabel}>Carbs</Text>
+        </View>
+          </View>
+        </View>
+      )}
+   
 
       {/* Error Message */}
       {errorMessage && <Text style={styles.errorText}>{errorMessage}</Text>}
@@ -221,4 +261,44 @@ const styles = StyleSheet.create({
         borderColor: "#ced4da",
         backgroundColor: "#ffffff",
       },
+    macroCard: {
+        backgroundColor: "#ffffff",
+        padding: 15,
+        borderRadius: 10,
+        marginBottom: 20,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 5,
+        elevation: 3,
+    },
+    macroItems: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        margin: 20,
+        paddingLeft: 20,
+        paddingRight: 20,
+    },
+    macroLabel: {
+        fontSize: 15,
+        color: "black",
+    },
+    macroRow: {
+        flexDirection: "column",
+        justifyContent: "space-between",
+        marginBottom: 10,
+    },
+    macroValue: {
+      fontSize: 20,
+      color: "#212529",
+    },
+    macroButton: {
+      backgroundColor: "#1a73ee",
+      paddingVertical: 15,
+      borderRadius: 10,
+      alignItems: "center",
+      opacity: 0.85,
+      marginBottom: 20,
+    }
   });
