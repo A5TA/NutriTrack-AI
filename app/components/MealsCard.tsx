@@ -1,13 +1,60 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MealItem } from "./MealItem";
+import modelService from "../services/modelSevice";
 
 export const MealsCard = () => {
+  const [meals, setMeals] = useState<Meal[]>([]);
+
+  useEffect(() => {
+    const fetchTodaysMeals = async () => {
+      try {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1; // JavaScript months are 0-indexed
+        const day = now.getDate();
+        
+        const dateOnly = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        const response = await modelService.getAllMeals(dateOnly, ""); // endDate is empty for now since we only want today's meals
+
+        if (response === null || response?.count === 0) {
+          console.error("No meals found");
+          return;
+        }
+        setMeals(response?.meals);
+        console.log("Fetched meals:", response);
+      } catch (error) {
+        console.error("Error fetching meals:", error);
+      }
+    };
+
+    fetchTodaysMeals();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Today's Meals</Text>
-      <MealItem mealName="Breakfast" description="Oatmeal with berries" calories="320" />
-      <MealItem mealName="Lunch" description="Grilled chicken salad" calories="450" />
+      <Text style={styles.header}>Breakfast</Text>
+      {meals.filter(meal => meal.MealType === 'Breakfast').map((meal, index) => (
+      <MealItem
+        key={`breakfast-${index}`}
+        meal={meal}
+      />
+      ))}
+      <Text style={styles.header}>Lunch</Text>
+      {meals.filter(meal => meal.MealType === 'Lunch').map((meal, index) => (
+      <MealItem
+        key={`lunch-${index}`}
+        meal={meal}
+      />
+      ))}
+      <Text style={styles.header}>Dinner</Text>
+      {meals.filter(meal => meal.MealType === 'Dinner').map((meal, index) => (
+      <MealItem
+        key={`dinner-${index}`}
+        meal={meal}
+      />
+      ))}
     </View>
   );
 };

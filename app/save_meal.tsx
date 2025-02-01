@@ -38,6 +38,21 @@ export default function SaveMealScreen() {
     fetchPredictions();
   }, []);
 
+  //Get all the currently stored macros so the user doesn't store an item that has no macros
+  const handleGetAllUseableMacros = async () => {
+    try {
+      const allMealMacros = await modelService.getAllMealMacros();
+      console.log("Meal Macros: ", mealMacros);
+      const mealNamesSet = new Set<string>(); // Use a set to avoid duplicates and so that lookup is easier
+      allMealMacros.meals.forEach((macro: Macros) => {
+        mealNamesSet.add(macro.Name); //we only need the names to determin if the meal is already stored
+      });
+      return mealNamesSet;
+    } catch (error) {
+      console.error("Error fetching meal macros: ", error);
+    }
+  }
+
   const handleInputChange = (text: string) => {
     setModifiedClass(text);
     setErrorMessage(null); // Clear error message on input change
@@ -55,8 +70,15 @@ export default function SaveMealScreen() {
         return;
     }
 
+    const lowerModifiedClass = modifiedClass.toLocaleLowerCase(); // Convert to lowercase for easier comparison ex: Pizza === PiZZa === pizza
+    const mealNamesSet = await handleGetAllUseableMacros();
+    if (!mealNamesSet || !mealNamesSet.has(lowerModifiedClass)) {
+      setErrorMessage(`The macros for ${modifiedClass} are not available.`);
+      return;
+    }
+
     try {
-      const uploadResult = await modelService.storePredictionImage(predictedUri, modifiedClass, mealType);
+      const uploadResult = await modelService.storePredictionImage(predictedUri, lowerModifiedClass, mealType);
       console.log("Store results: ", uploadResult);
       setErrorMessage(null); // Clear any previous error messages
       router.push("/");// Navigate only after successful submission

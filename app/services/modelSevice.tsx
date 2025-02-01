@@ -5,6 +5,8 @@ class ModelService {
     predictedUri: string | null = null;
     predictedClass: string | null = null;
 
+    userId: string = "User1"; // Hardcoded for now
+
     async getMealMacros(mealType: string | null) {
       try {
         if (!mealType || mealType === "") {
@@ -20,6 +22,30 @@ class ModelService {
         console.error('Error during fetching meal macros:', error);
         return null;
       }
+    }
+
+    async getAllMeals(startDate: string, endDate: string) {
+      const formData = new FormData();
+      try {
+        formData.append('userId', this.userId); 
+        formData.append('startDate', startDate);
+        formData.append('endDate', endDate);
+
+        console.log('Fetching all meals from:', startDate, 'to:', endDate, 'for user:', this.userId);
+        const response = await fetch(`${this.api_endpoint_backend}/getAllMeals`, {
+          method: 'POST',
+          body: formData,
+        });
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error during fetching all meals:', error);
+        return null;
+      }
+
     }
 
     async updatePredictedClass(newClass: string | null) {
@@ -77,6 +103,7 @@ class ModelService {
         const imageResponse = await fetch(imageUri);
         const imageBlob = await imageResponse.blob(); // Convert URI to Blob
 
+        formData.append('userId', this.userId); 
         // Append the image file to the formData
         formData.append('image', imageBlob, `${new Date().toISOString()}.jpeg`); 
         // Append additional data for easier storage
@@ -101,7 +128,41 @@ class ModelService {
         return null;
       }
     }
+
+    //Used to display the images on the home page
+    async getImageByURL(url: string) : Promise<string | null> {
+      try {
+      const response = await fetch(`${this.api_endpoint_backend}/getImage/${url}`);
+      if (!response.ok) {
+        return null;
+      }
+      const blob = await response.blob();
+      return URL.createObjectURL(blob); // Convert blob to object URL
+      } catch (error) {
+      console.error('Error during fetching image:', error);
+      return null;
+      }
+    }
+
+    //Get all the currently stored macros so the user doesn't store an item that has no macros
+    async getAllMealMacros() {
+      try {
+        const response = await fetch(`${this.api_endpoint_backend}/getAllMealMacros`);
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error during fetching all macros:', error);
+        return null;
+      }
+    }
+
   }
+
+
+  
 
 const modelService = new ModelService();
 export default modelService;  
