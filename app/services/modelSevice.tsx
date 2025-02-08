@@ -159,6 +159,30 @@ class ModelService {
       }
     }
 
+    //Store the meal macros
+    async storeMealMacros(mealName: string, protein: string, fats: string, carbs: string, calories: string) {
+      const formData = new FormData();
+      formData.append('mealName', mealName);
+      formData.append('protein', protein);
+      formData.append('fat', fats);
+      formData.append('carbs', carbs);
+      formData.append('calories', calories);
+
+      try {
+        const response = await fetch(`${this.api_endpoint_backend}/addMacros`, {
+          method: 'POST',
+          body: formData,
+        });
+        if (!response.ok) {
+          return null;
+        }
+        const data = await response.json();
+        return data;
+      } catch (error) {
+        console.error('Error during storing meal macros:', error);
+        return null;
+      }
+    }
   }
 
 

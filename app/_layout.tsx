@@ -6,6 +6,7 @@ export default function RootLayout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="camera" />
       <Stack.Screen name ="save_meal" />
+      <Stack.Screen name="save_macros" />
       <Stack.Screen name="+not-found" />
     </Stack>
   );
