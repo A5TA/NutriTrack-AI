@@ -1,14 +1,77 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import CircularProgress from 'react-native-circular-progress-indicator';
+import modelService from "../services/modelSevice";
+
+
+interface DailyMacros {
+  Calories: number;
+  Protein: number;
+  Carbs: number;
+  Fat: number;
+}
 
 export const SummaryCard = () => {
+  const [macroGoal, setMacroGoal] = useState<DailyMacros>({
+    Calories: 2000,
+    Protein: 100,
+    Carbs: 50,
+    Fat: 30
+  });
+  const [totalMacros, setTotalMacros] = useState<DailyMacros>({
+    Calories: 0,
+    Protein: 0,
+    Carbs: 0,
+    Fat: 0,
+  });
+
+  const [progress, setProgress] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchTodaysMacros = async () => {
+      try {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth() + 1; // JavaScript months are 0-indexed
+        const day = now.getDate();
+
+        const dateOnly = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
+        const response = await modelService.getAllMeals(dateOnly, ""); // Fetch today's meals
+
+        if (!response || response.count === 0) {
+          console.error("No meals found");
+          return;
+        }
+
+        // Accumulate total macros
+        const accumulatedMacros: DailyMacros = response.meals.reduce(
+          (acc: DailyMacros, meal: Meal) => ({
+            Calories: acc.Calories + meal.Macros.Calories,
+            Protein: acc.Protein + meal.Macros.Protein,
+            Carbs: acc.Carbs + meal.Macros.Carbs,
+            Fat: acc.Fat + meal.Macros.Fat,
+          }),
+          { Calories: 0, Protein: 0, Carbs: 0, Fat: 0 }
+        );
+
+        setProgress(Math.min(100, Math.max(0, Math.round((accumulatedMacros.Calories / macroGoal.Calories) * 100))));
+
+        setTotalMacros(accumulatedMacros);
+        console.log("Fetched meals:", response);
+      } catch (error) {
+        console.error("Error fetching meals:", error);
+      }
+    };
+
+    fetchTodaysMacros();
+  }, []);
+
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Today's Summary</Text>
       <View style={styles.content}>
       <CircularProgress
-        value={60}
+        value={progress}
         valueSuffix="%"
         radius={40} // Adjust size
         valueSuffixStyle={styles.suffixStyle}
@@ -20,10 +83,10 @@ export const SummaryCard = () => {
         />
         <View style={styles.macroInfo}>
           <Text style={styles.caloriesText}>Calories</Text>
-          <Text style={styles.macroValue}>1,200 / 2,000</Text>
-          <Text>Protein: 60g / 100g</Text>
-          <Text>Carbs: 150g / 250g</Text>
-          <Text>Fat: 40g / 65g</Text>
+          <Text style={styles.macroValue}>{totalMacros.Calories} / {macroGoal.Calories}</Text>
+          <Text>Protein: {totalMacros.Protein}g / {macroGoal.Protein}g</Text>
+          <Text>Carbs: {totalMacros.Carbs}g / {macroGoal.Carbs}g</Text>
+          <Text>Fat: {totalMacros.Fat}g / {macroGoal.Fat}g</Text>
         </View>
       </View>
     </View>
