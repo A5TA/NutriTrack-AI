@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import CircularProgress from 'react-native-circular-progress-indicator';
 import modelService from "../services/modelSevice";
+import { useSettings } from "../context/SettingsContext";
 
 
 interface DailyMacros {
@@ -12,12 +13,7 @@ interface DailyMacros {
 }
 
 export const SummaryCard = () => {
-  const [macroGoal, setMacroGoal] = useState<DailyMacros>({
-    Calories: 2000,
-    Protein: 100,
-    Carbs: 50,
-    Fat: 30
-  });
+  const { calories, protein, carbs, fat } = useSettings();
   const [totalMacros, setTotalMacros] = useState<DailyMacros>({
     Calories: 0,
     Protein: 0,
@@ -43,18 +39,18 @@ export const SummaryCard = () => {
           return;
         }
 
-        // Accumulate total macros
+       // Accumulate total macros with values fixed to 2 decimal places
         const accumulatedMacros: DailyMacros = response.meals.reduce(
           (acc: DailyMacros, meal: Meal) => ({
-            Calories: acc.Calories + meal.Macros.Calories,
-            Protein: acc.Protein + meal.Macros.Protein,
-            Carbs: acc.Carbs + meal.Macros.Carbs,
-            Fat: acc.Fat + meal.Macros.Fat,
+            Calories: parseFloat((acc.Calories + meal.Macros.Calories).toFixed(2)),
+            Protein: parseFloat((acc.Protein + meal.Macros.Protein).toFixed(2)),
+            Carbs: parseFloat((acc.Carbs + meal.Macros.Carbs).toFixed(2)),
+            Fat: parseFloat((acc.Fat + meal.Macros.Fat).toFixed(2)),
           }),
           { Calories: 0, Protein: 0, Carbs: 0, Fat: 0 }
         );
 
-        setProgress(Math.min(100, Math.max(0, Math.round((accumulatedMacros.Calories / macroGoal.Calories) * 100))));
+        setProgress(Math.min(100, Math.max(0, Math.round((accumulatedMacros.Calories / calories) * 100))));
 
         setTotalMacros(accumulatedMacros);
         console.log("Fetched meals:", response);
@@ -65,6 +61,12 @@ export const SummaryCard = () => {
 
     fetchTodaysMacros();
   }, []);
+
+  // Update progress when settings change
+  useEffect(() => {
+    setProgress(Math.min(100, Math.max(0, Math.round((totalMacros.Calories / calories) * 100))));
+  }, [calories, protein, carbs, fat]); // Updates progress only when the settings macros change
+
 
   return (
     <View style={styles.container}>
@@ -83,10 +85,10 @@ export const SummaryCard = () => {
         />
         <View style={styles.macroInfo}>
           <Text style={styles.caloriesText}>Calories</Text>
-          <Text style={styles.macroValue}>{totalMacros.Calories} / {macroGoal.Calories}</Text>
-          <Text>Protein: {totalMacros.Protein}g / {macroGoal.Protein}g</Text>
-          <Text>Carbs: {totalMacros.Carbs}g / {macroGoal.Carbs}g</Text>
-          <Text>Fat: {totalMacros.Fat}g / {macroGoal.Fat}g</Text>
+          <Text style={styles.macroValue}>{totalMacros.Calories} / {calories}</Text>
+          <Text>Protein: {totalMacros.Protein}g / {protein}g</Text>
+          <Text>Carbs: {totalMacros.Carbs}g / {carbs}g</Text>
+          <Text>Fat: {totalMacros.Fat}g / {fat}g</Text>
         </View>
       </View>
     </View>
@@ -128,7 +130,7 @@ const styles = StyleSheet.create({
     color: "#4caf50",
   },
   suffixStyle: {
-    left: -115,
+    left: -110,
     fontSize: 18,
     fontWeight: "bold" 
   },

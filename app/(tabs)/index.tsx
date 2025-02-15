@@ -70,6 +70,7 @@ const styles = StyleSheet.create<Style>({
     width: '100%', 
     justifyContent: 'center',
     alignItems: 'center', 
+    marginTop: 10,
   },
   widgetsContent: {
     paddingBottom: 20,

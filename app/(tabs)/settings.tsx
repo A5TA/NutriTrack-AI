@@ -2,12 +2,11 @@ import { Ionicons } from "@expo/vector-icons";
 import React, { useState } from "react";
 import { View, Text, TextInput, StyleSheet, ScrollView } from "react-native";
 import { Card, HelperText } from "react-native-paper";
+import { useSettings } from "../context/SettingsContext";
 
 const SettingsScreen = () => {
-  const [calories, setCalories] = useState("2000");
-  const [protein, setProtein] = useState("150");
-  const [carbs, setCarbs] = useState("200");
-  const [fat, setFat] = useState("65");
+  const { calories, protein, carbs, fat, setCalories, setProtein, setCarbs, setFat } = useSettings();
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -17,9 +16,8 @@ const SettingsScreen = () => {
           <TextInput
             style={styles.input}
             keyboardType="numeric"
-            value={calories}
-            onChangeText={setCalories}
-          />
+            value={calories.toString()}
+            onChangeText={(value) => setCalories(parseFloat(value) || 0)}/>
           <Text style={styles.unit}>kcal</Text>
         </View>
       </Card>
@@ -30,9 +28,9 @@ const SettingsScreen = () => {
           <TextInput
             style={styles.input}
             keyboardType="numeric"
-            value={protein}
-            onChangeText={setProtein}
-          />
+          value={protein.toString()}
+          onChangeText={(value) => setProtein(parseFloat(value) || 0)}
+        />
           <Text style={styles.unit}>g</Text>
         </View>
       </Card>
@@ -43,8 +41,8 @@ const SettingsScreen = () => {
           <TextInput
             style={styles.input}
             keyboardType="numeric"
-            value={carbs}
-            onChangeText={setCarbs}
+            value={carbs.toString()}
+            onChangeText={(value) => setCarbs(parseFloat(value) || 0)}
           />
           <Text style={styles.unit}>g</Text>
         </View>
@@ -56,8 +54,8 @@ const SettingsScreen = () => {
           <TextInput
             style={styles.input}
             keyboardType="numeric"
-            value={fat}
-            onChangeText={setFat}
+            value={fat.toString()}
+            onChangeText={(value) => setFat(parseFloat(value) || 0)}
           />
           <Text style={styles.unit}>g</Text>
         </View>
