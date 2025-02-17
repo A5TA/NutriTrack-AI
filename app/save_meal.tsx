@@ -5,21 +5,29 @@ import modelService from "./services/modelSevice";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Picker } from "@react-native-picker/picker";
 
+const getMatchBackgroundColor = (confidence: number) => {
+  if (confidence >= 0.8) return "#4CAF50"; // Green for high confidence (80%+)
+  if (confidence >= 0.5) return "#FFBF00"; // Yellow for medium confidence (50%+)
+  return "#FF0000"; // Red for low confidence (<50%)
+};
+
 export default function SaveMealScreen() {
   const [predictedClass, setPredictedClass] = useState<string | null>(null);
+  const [predictedConfidence, setPredictedConfidence] = useState<number | null>(null);
   const [modifiedClass, setModifiedClass] = useState<string | null>(null);
   const [predictedUri, setPredictedUri] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [mealMacros, setMealMacros] = useState<any | null>(null);
 
   const [mealType, setMealType] = useState<string>("Breakfast");
-
+  const [matchBackgroundColor, setMatchBackgroundColor] = useState<string>("#f1f399");
   useEffect(() => {
     // Initialize predicted values from the service
     const fetchPredictions = async () => {
       try {
         const predictedClassFromService = await modelService.getPredictedClass();
         const predictedUriFromService = await modelService.getPredictedUri();
+        const predictedConfidenceFromService = await modelService.getPredictedConfidence();
         if (predictedClassFromService != null) {
             const readableClass = predictedClassFromService.replace("_", " ");
             setPredictedClass(readableClass); //make it readable
@@ -30,6 +38,14 @@ export default function SaveMealScreen() {
         }
         
         setPredictedUri(predictedUriFromService);
+        setPredictedConfidence(predictedConfidenceFromService);
+
+        //Get the color for mathc
+        if (predictedConfidenceFromService != null) {
+          const matchBgColor = getMatchBackgroundColor(predictedConfidenceFromService);
+           setMatchBackgroundColor(matchBgColor);
+        }
+      
       } catch (error) {
         console.error("Error fetching predictions: ", error);
       }
@@ -118,8 +134,17 @@ export default function SaveMealScreen() {
       {/* AI Prediction */}
       <Text style={styles.predictionLabel}>AI Prediction</Text>
       <View style={styles.predictionBox}>
-      <FontAwesome6 name="wand-magic-sparkles" size={14} color="black" />
-        <Text style={styles.predictionText}>{predictedClass || "Loading..."}</Text>
+        <FontAwesome6 name="wand-magic-sparkles" size={14} color="black" />
+        {predictedClass != null ? 
+        <View style={styles.predictionContent}>
+          <Text style={styles.predictionText}>{predictedClass}</Text>
+          <View style={[styles.matchContainer, { backgroundColor: matchBackgroundColor }]}>
+            <Text style={styles.confidenceText}>{predictedConfidence != null ? `${(predictedConfidence * 100).toFixed(0)}% Match` : "N/A"}</Text>
+          </View>
+        </View>
+        :
+        <Text style={styles.predictionText}>Loading...</Text>
+        }
       </View>
 
       {/* Edit Food Name */}
@@ -221,6 +246,7 @@ const styles = StyleSheet.create({
       display: 'flex',
       flexDirection: 'row',
       alignItems: 'center',
+      justifyContent: "space-between",
       gap: 10,
       padding: 15,
       borderRadius: 10,
@@ -235,6 +261,9 @@ const styles = StyleSheet.create({
       fontSize: 16,
       fontWeight: "bold",
       color: "#212529",
+      flexWrap: "wrap", 
+      flexShrink: 1, 
+      maxWidth: "60%", 
     },
     inputContainer: {
       marginBottom: 20,
@@ -322,5 +351,30 @@ const styles = StyleSheet.create({
       alignItems: "center",
       opacity: 0.85,
       marginBottom: 20,
+    },
+    predictionContent: {
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignContent: "center",
+      alignItems: "center",
+      width: "100%",
+      flexWrap: "wrap", // Allows content to wrap when needed
+    },
+    matchContainer: {
+      backgroundColor: "#f1f399",
+      display: 'flex',
+      flexDirection: 'row',
+      alignContent: 'center',
+      alignItems: "center",
+      padding: 5,
+      borderRadius: 5,
+      marginRight: 20,
+      height: 30,
+    },
+    confidenceText: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: "white",
     }
   });

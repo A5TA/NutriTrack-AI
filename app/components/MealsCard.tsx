@@ -35,26 +35,29 @@ export const MealsCard = () => {
     <View style={styles.container}>
       <Text style={styles.header}>Today's Meals</Text>
       <Text style={styles.header}>Breakfast</Text>
-      {meals.filter(meal => meal.MealType === 'Breakfast').map((meal, index) => (
-      <MealItem
-        key={`breakfast-${index}`}
-        meal={meal}
-      />
-      ))}
+      {meals.some(meal => meal.MealType === 'Breakfast') ? (
+        meals.filter(meal => meal.MealType === 'Breakfast').map((meal, index) => (
+          <MealItem key={`breakfast-${index}`} meal={meal} />
+        ))
+      ) : (
+        <Text style={styles.noMealText}>Meal not recorded</Text>
+      )}
       <Text style={styles.header}>Lunch</Text>
-      {meals.filter(meal => meal.MealType === 'Lunch').map((meal, index) => (
-      <MealItem
-        key={`lunch-${index}`}
-        meal={meal}
-      />
-      ))}
+      {meals.some(meal => meal.MealType === 'Lunch') ? (
+      meals.filter(meal => meal.MealType === 'Lunch').map((meal, index) => (
+          <MealItem key={`lunch-${index}`} meal={meal} />
+        ))
+      ) : (
+        <Text style={styles.noMealText}>Meal not recorded</Text>
+      )}
       <Text style={styles.header}>Dinner</Text>
-      {meals.filter(meal => meal.MealType === 'Dinner').map((meal, index) => (
-      <MealItem
-        key={`dinner-${index}`}
-        meal={meal}
-      />
-      ))}
+      {meals.some(meal => meal.MealType === 'Dinner') ? (
+      meals.filter(meal => meal.MealType === 'Dinner').map((meal, index) => (
+          <MealItem key={`dinner-${index}`} meal={meal} />
+        ))
+      ) : (
+        <Text style={styles.noMealText}>Meal not recorded</Text>
+      )}
     </View>
   );
 };
@@ -76,5 +79,11 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     marginBottom: 15,
   },
+  noMealText: {
+    fontSize: 14,
+    color: "#888",
+    fontStyle: "italic",
+    marginBottom: 10,
+  }
 });
 

@@ -4,6 +4,7 @@ class ModelService {
 
     predictedUri: string | null = null;
     predictedClass: string | null = null;
+    predictedConfidence: number | null = null;
 
     userId: string = "User1"; // Hardcoded for now
 
@@ -52,6 +53,10 @@ class ModelService {
       this.predictedClass = newClass ? newClass : "";
     }
 
+    async updatePredictedConfidence(confidence: number | null ) {
+      this.predictedConfidence = confidence ? confidence : 0;
+    }
+
     async updatePredictedUri(uri: string) {
       this.predictedUri = uri;
     }
@@ -62,6 +67,10 @@ class ModelService {
 
     async getPredictedUri() {
       return this.predictedUri;
+    }
+
+    async getPredictedConfidence() {
+      return this.predictedConfidence;
     }
 
     async predictImage(imageUri: string) {

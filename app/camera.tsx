@@ -37,8 +37,10 @@ export default function CameraScreen() {
       }
     
       const predictedClassName = predictionResult.data.predicted_class;
+      const predictedConfidence = predictionResult.data.confidence;
       console.log("Predicted as: ", predictionResult);
       modelService.updatePredictedClass(predictedClassName); //store the predicted class in the service
+      modelService.updatePredictedConfidence(predictedConfidence); //Store the confidence percentage in the service
       router.push("/save_meal");// Navigate only after predictions are stored
     }
   };

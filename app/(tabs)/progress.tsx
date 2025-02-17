@@ -4,12 +4,6 @@ import { Card } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import modelService from "../services/modelSevice";
 
-// const mealPlan: Record<string, string[]> = {
-//   "2025-02-01": ["Breakfast: Oatmeal", "Lunch: Grilled Chicken", "Dinner: Salmon"],
-//   "2025-02-02": ["Breakfast: Pancakes", "Lunch: Salad", "Dinner: Pasta"],
-//   "2025-02-03": ["Breakfast: Smoothie", "Lunch: Sushi", "Dinner: Steak"],
-// };
-
 interface DailyMealInfo {
   breakfast: string[],
   lunch: string[],
