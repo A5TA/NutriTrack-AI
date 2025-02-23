@@ -22,6 +22,8 @@ export const SummaryCard = () => {
   });
 
   const [progress, setProgress] = useState<number>(0);
+  const {userId} = useSettings();
+  
 
   useEffect(() => {
     const fetchTodaysMacros = async () => {
@@ -32,7 +34,7 @@ export const SummaryCard = () => {
         const day = now.getDate();
 
         const dateOnly = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        const response = await modelService.getAllMeals(dateOnly, ""); // Fetch today's meals
+        const response = await modelService.getAllMeals(dateOnly, "", userId); // Fetch today's meals
 
         if (!response || response.count === 0) {
           console.error("No meals found");

@@ -6,8 +6,6 @@ class ModelService {
     predictedClass: string | null = null;
     predictedConfidence: number | null = null;
 
-    userId: string = "User1"; // Hardcoded for now
-
     async getMealMacros(mealType: string | null) {
       try {
         if (!mealType || mealType === "") {
@@ -25,14 +23,17 @@ class ModelService {
       }
     }
 
-    async getAllMeals(startDate: string, endDate: string) {
+    async getAllMeals(startDate: string, endDate: string, userId: string | null) {
+      if (userId == null) {
+        return null;
+      }
       const formData = new FormData();
       try {
-        formData.append('userId', this.userId); 
+        formData.append('userId', userId); 
         formData.append('startDate', startDate);
         formData.append('endDate', endDate);
 
-        console.log('Fetching all meals from:', startDate, 'to:', endDate, 'for user:', this.userId);
+        console.log('Fetching all meals from:', startDate, 'to:', endDate, 'for user:', userId);
         const response = await fetch(`${this.api_endpoint_backend}/getAllMeals`, {
           method: 'POST',
           body: formData,
@@ -102,7 +103,10 @@ class ModelService {
         return null;
       }
     }
-    async storePredictionImage(imageUri: string, predictedClass: string, mealType : string) {
+    async storePredictionImage(imageUri: string, predictedClass: string, mealType : string, userId: string | null) {
+      if (userId == null) {
+        return null;
+      }
       const formData = new FormData();
       if (predictedClass == null) {
         return null; //We can store an unlabeled image
@@ -112,7 +116,7 @@ class ModelService {
         const imageResponse = await fetch(imageUri);
         const imageBlob = await imageResponse.blob(); // Convert URI to Blob
 
-        formData.append('userId', this.userId); 
+        formData.append('userId', userId); 
         // Append the image file to the formData
         formData.append('image', imageBlob, `${new Date().toISOString()}.jpeg`); 
         // Append additional data for easier storage

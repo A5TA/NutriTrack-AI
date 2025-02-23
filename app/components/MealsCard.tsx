@@ -2,9 +2,12 @@ import React, { useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { MealItem } from "./MealItem";
 import modelService from "../services/modelSevice";
+import { useSettings } from "../context/SettingsContext";
 
 export const MealsCard = () => {
   const [meals, setMeals] = useState<Meal[]>([]);
+    const {userId} = useSettings();
+  
 
   useEffect(() => {
     const fetchTodaysMeals = async () => {
@@ -15,7 +18,7 @@ export const MealsCard = () => {
         const day = now.getDate();
         
         const dateOnly = `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        const response = await modelService.getAllMeals(dateOnly, ""); // endDate is empty for now since we only want today's meals
+        const response = await modelService.getAllMeals(dateOnly, "", userId); // endDate is empty for now since we only want today's meals
 
         if (response === null || response?.count === 0) {
           console.error("No meals found");

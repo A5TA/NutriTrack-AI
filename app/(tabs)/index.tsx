@@ -4,12 +4,14 @@ import Entypo from '@expo/vector-icons/Entypo';
 import { CustomButton } from '../components/CustomButton';
 import { SummaryCard } from '../components/SummaryCard';
 import { MealsCard } from '../components/MealsCard';
+import { useSettings } from '../context/SettingsContext';
 
 export default function Index() {
+  const {userId} = useSettings();
   return (
     <View style={styles.container}>
       <View style={styles.mainContent}>
-        <Text style={styles.title}>Welcome to NutriTrack AI</Text>
+        <Text style={styles.title}>Welcome to NutriTrack AI {userId}</Text>
         <ScrollView 
           style={styles.widgets}
           contentContainerStyle={styles.widgetsContent}
@@ -45,7 +47,7 @@ const styles = StyleSheet.create<Style>({
     alignItems: 'center',
   },
   title: {
-    fontSize: 22, 
+    fontSize: 18, 
     fontWeight: '700',
     color: 'white', 
     textAlign: 'center', 

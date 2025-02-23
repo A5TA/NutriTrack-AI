@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from "react-native";
 import { Card } from "react-native-paper";
 import { Calendar } from "react-native-calendars";
 import modelService from "../services/modelSevice";
+import { useSettings } from "../context/SettingsContext";
 
 interface DailyMealInfo {
   breakfast: string[],
@@ -29,6 +30,7 @@ const Progress = () => {
   // Get today's date in YYYY-MM-DD format
   const [selectedDate, setSelectedDate] = useState<string>(getTodayEST());
   const [mealPlan, setMealPlan] = useState<Record<string, DailyMealInfo>>({});
+  const {userId} = useSettings();
 
   useEffect(() => {
     const fetchAllMeals = async () => {
@@ -41,7 +43,7 @@ const Progress = () => {
         const date = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         const startDate = `${year-1}-${date}`;
         const endDate = `${year}-${date}`;
-        const response = await modelService.getAllMeals(startDate, endDate); // endDate is empty for now since we only want today's meals
+        const response = await modelService.getAllMeals(startDate, endDate, userId); // endDate is empty for now since we only want today's meals
 
         if (response === null || response?.count === 0) {
           console.error("No meals found");

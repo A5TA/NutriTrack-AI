@@ -4,6 +4,7 @@ import { View, StyleSheet, TextInput, Text, TouchableOpacity, Image, } from "rea
 import modelService from "./services/modelSevice";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import { Picker } from "@react-native-picker/picker";
+import { useSettings } from "./context/SettingsContext";
 
 const getMatchBackgroundColor = (confidence: number) => {
   if (confidence >= 0.8) return "#4CAF50"; // Green for high confidence (80%+)
@@ -21,6 +22,8 @@ export default function SaveMealScreen() {
 
   const [mealType, setMealType] = useState<string>("Breakfast");
   const [matchBackgroundColor, setMatchBackgroundColor] = useState<string>("#f1f399");
+
+  const {userId} = useSettings();
   useEffect(() => {
     // Initialize predicted values from the service
     const fetchPredictions = async () => {
@@ -94,7 +97,7 @@ export default function SaveMealScreen() {
     }
 
     try {
-      const uploadResult = await modelService.storePredictionImage(predictedUri, lowerModifiedClass, mealType);
+      const uploadResult = await modelService.storePredictionImage(predictedUri, lowerModifiedClass, mealType, userId);
       console.log("Store results: ", uploadResult);
       setErrorMessage(null); // Clear any previous error messages
       router.push("/");// Navigate only after successful submission

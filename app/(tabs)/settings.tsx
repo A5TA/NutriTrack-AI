@@ -1,12 +1,16 @@
 import { Ionicons } from "@expo/vector-icons";
-import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, ScrollView } from "react-native";
+import React from "react";
+import { View, Text, TextInput, StyleSheet, ScrollView, Pressable } from "react-native";
 import { Card, HelperText } from "react-native-paper";
 import { useSettings } from "../context/SettingsContext";
 
 const SettingsScreen = () => {
-  const { calories, protein, carbs, fat, setCalories, setProtein, setCarbs, setFat } = useSettings();
+  const { calories, protein, carbs, fat, setCalories, setProtein, setCarbs, setFat, clearAllSettings} = useSettings();
 
+
+  function handleLogout(): void {
+    clearAllSettings();
+  }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -71,6 +75,13 @@ const SettingsScreen = () => {
           </HelperText>
         </View>
       </Card>
+      <Pressable
+      onPress={handleLogout}
+      style={styles.button}
+    >
+      <Text style={styles.buttonText}>Logout</Text>
+    </Pressable>
+
     </ScrollView>
   );
 };
@@ -121,6 +132,20 @@ const styles = StyleSheet.create({
   },
   infoText: {
     flex: 1,
+  },
+  button: {
+    backgroundColor: "#EF4444", // Red-500
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 10,
+  },
+  buttonText: {
+    color: "#FFFFFF",
+    fontSize: 16,
+    fontWeight: "600",
   },
 });
 
