@@ -43,7 +43,7 @@ const Progress = () => {
         const date = `${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
         const startDate = `${year-1}-${date}`;
         const endDate = `${year}-${date}`;
-        const response = await modelService.getAllMeals(startDate, endDate, userId); // endDate is empty for now since we only want today's meals
+        const response = await modelService.getAllMeals(startDate, endDate, userId);
 
         if (response === null || response?.count === 0) {
           console.error("No meals found");
@@ -55,7 +55,10 @@ const Progress = () => {
         const formattedMeals: Record<string, DailyMealInfo> = {};
 
         meals.forEach((meal) => {
-          const mealDate = new Date(meal.Date).toISOString().split("T")[0]; // Extract YYYY-MM-DD
+          const date = new Date(meal.Date)
+          .toLocaleDateString("en-US", { timeZone: "America/New_York" })
+          .split("/"); // Splits into [MM, DD, YYYY]
+          const mealDate = `${date[2]}-${date[0].padStart(2, "0")}-${date[1].padStart(2, "0")}`;
           if (!formattedMeals[mealDate]) {
             formattedMeals[mealDate] = {
               breakfast: [],

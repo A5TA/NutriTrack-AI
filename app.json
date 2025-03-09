@@ -32,6 +32,12 @@
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos to identify foods to be logged."
+        }
       ]
     ],
     "experiments": {

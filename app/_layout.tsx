@@ -14,6 +14,7 @@ export default function RootLayout() {
 
         {/* Other Screens */}
         <Stack.Screen name="camera" />
+        <Stack.Screen name="upload" />
         <Stack.Screen name="save_meal" />
         <Stack.Screen name="save_macros" />
         <Stack.Screen name="+not-found" />
