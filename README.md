@@ -1,6 +1,22 @@
-# Welcome to your Expo app 👋
+# NutriTrack-AI
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+NutriTrack-AI is a AI-powered mobile app built with [Expo](https://expo.dev) and designed to help users track their macros. The app utilizes a [`AI backend`](https://github.com/A5TA/NutriTrack-AI-Backend) to handle CRUD operations and a [`AI Predictor`](https://github.com/A5TA/NutriTrack-AI-Predictor) to perform image classification for user uploaded meal images.
+
+## Features
+
+### Food Recognition & Tracking 
+* AI-powered food recognition to accurately identify and analyze meals from pictures.
+* Database of different food macronutrients (proteins, carbohydrates, and fats).
+* Allows users to manually input macros of their food if not already stored.
+* Allows users to take pictures of food with the built in camera or image upload.
+
+### Health Insights & History
+* Visualizes daily, weekly, and monthly nutrition data with daily list or calander.
+* Tracks key health macros and showcases the user’s progress toward their health goals.
+
+### Other
+* Simple Authentication via username to see personally tracked meals
+* User Session handling to remember logged in user and set settings 
 
 ## Get started
 
